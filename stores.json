@@ -1,0 +1,20 @@
+ "root": {
+        "XmlDocVersion": "",
+        "ChainId": "234255353534",									 //@string  network id connect to ChainId in product
+        "Stores": {																 //@list of stores in the network
+        "store": [ 																// @array - list of stores
+		{
+		  "storeId": "7", 														//@int connected to storeID in products
+		  "SubChainid": "15", 												//@string  subnetwork id connect to SubChainId in product
+	      "ChainName"    : "קואופ שופ", 								// @string - network name - name of the network
+		  "SubChainName": "מגה בעיר",								// @string - subnetwork name - name of the subnetwork
+		  "BikoretNo": "3",
+		  "StoreType": "1", 												//@int possible online offline
+		  "StoreName": "בילו", 											//@string the name of the store
+		  "Address": "unknown",											//@string the adress of the store
+		  "City": "unknown",												//@string the city of the store
+		  "ZipCode": "unknown"											//@int the zipcode of the store
+		  "LastUpdateDateTime": "11:23:11 21/01/2015",    //DateTime(HH:MM:SS DD/MM/YYYY) when the file was updated
+          "Latitude": "",														//double the Latitude of the location of the store - should pars  it from the adress if there is no data
+          "Longitude": ""														//double the Longitude of the location of the store - should pars  it from the adress if there is no data
+ }

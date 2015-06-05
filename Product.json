@@ -1,0 +1,35 @@
+// products/prices XML-TO-JSON structre
+{
+    "root": {
+		"XmlDocVersion" : "",
+		"DllVerNo": "9.4.0.15", 																	//@string - unknown
+		"ChainId"       : "", 																			// @string - id of the mother network-possible "hetpei" 
+		"SubChainId"    : "1", 																		// @string  subnetwork id connect to SubChainId in product
+		"StoreId"       : "1",																		    // @int - store id
+		"BikoretNo"     : "4", 																		// @string - unknown
+	        "Items": {
+            "item": [ // @array - list of products
+                {
+					"PriceUpdateDate"             : "2015-02-01 10:07:00", 			// @timestamp(yyyy-mm-dd hh:mm:ss) - price update timestamp, if your store have two diffrent fields(date and time), convert to this field
+					"ItemCode"                    : "1000801", 								// @string - product id/code
+					"ItemType"                    : "1", 											// @boolean - product type - weight/no weight
+					"ItemName"                    : "עוגת קרנץ פרג 500 גר", 				// @string - product name
+					"ManufacturerName"            : "", 										// @string - manufacture name
+					"ManufactureCountry"          : "ישראל", 								// @string - manufacture country from list of countries, of your country not inlude in this list pars it
+					"ManufacturerItemDescription" : "עוגת קרנץ פרג 500 גר", 		// @string - product description
+					"SoldByWeight"                : "", 											// @bool - is the item sold by weight
+					"Quantity"                    : "1000.00", 									// @float - quantity
+					"UnitOfMeasure"               : "קג", 										// @enum of units of measure (קג, ליטר, גרם, מיליטר, וכו)
+					"QtyInPackage"                : "0", 											// @int - item quantity
+					"UnitOfMeasurePrice"          : "0.0187", 								// @float - measure unit for item
+					"AllowDiscount"               : "1", 											// @boolean - allow discount
+					"bIsWeighted": "1", 															//@bool 1/0 -unknown
+					"ItemPrice": "3.90", 															//@float the price of the item 
+					"UnitOfMeasurePrice"          : "0.0187", 								// @float - measure unit for item
+					"AllowDiscount"               : "1", 											// @boolean - allow discount
+					"ItemStatus"                  : "1" 												// @int (maybe boolean) - unknown
+                }
+            ]
+        }
+    }
+}
