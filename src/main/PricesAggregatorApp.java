@@ -13,8 +13,7 @@ public class PricesAggregatorApp {
   }
 
   public enum ChainName {
-    coop, rami, dosh, tiv, shuf, hazi, keshet, yohan, osher, dor, victory, lahav, hashuk, mega, bitan// TODO
-                                                                                                     // eden
+    coop, rami, dosh, tiv, shuf, hazi, keshet, yohan, osher, dor, victory, lahav, hashuk, mega, bitan, eden
   }
 
   public static final String SUB_DIR_PRICES = "prices";
@@ -141,6 +140,11 @@ public class PricesAggregatorApp {
       BitanAggregator bitan = new BitanAggregator();
       logger.info("Excecuting " + bitan.getChainName() + " Aggregator. ");
       bitan.aggregate(sessionPath);
+      break;
+    case eden:
+      EdenAggregator eden = new EdenAggregator();
+      logger.info("Excecuting " + eden.getChainName() + " Aggregator. ");
+      eden.aggregate(sessionPath);
       break;
     default:
       logger.severe("No aggregation instructions for chain " + chainName

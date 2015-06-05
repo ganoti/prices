@@ -88,7 +88,8 @@ public class AggregatorWebClient extends WebClient {
       handleXmlResponse(response);
     } else if (contentType.equals("application/octet-stream")
         || contentType.equals("application/x-gzip")
-        || contentType.equals("application/zip")) {
+        || contentType.equals("application/zip")
+        || contentType.equals("application/x-zip-compressed")) {
       handleCompressedFileResponse(response);
     }
   }
