@@ -14,24 +14,36 @@ import os
 def dict_to_db():
     pass
 
+#Server IP: 130.211.170.156
 mongo_con = mng.MongoClient(host = 'localhost',
                             port = 27017)
 
 db=mongo_con.eifozol
 collection=db.test
 
+
 print os.getcwd()
-with open ("./xml/daily/20150603/osher/010/PricesFull7290103152017-010-201506030800.xml",'r') as prices_file:
-    prices_dict = xtd.parse(prices_file)
+rootdir = "./xml/daily"
 
-date = 'date20150603'
-collection = db[date]
-chain = 'osher'
-branch = '010'
-mongo_dict = dict(date = date,
-                  chain = chain,
-                  branch = branch,
-                  content = prices_dict['Root'])
-
-collection.insert(mongo_dict)
+for subdir, dirs, files in os.walk(rootdir):
+#    print subdir
+#    print dirs
+    for xml_file in files:
+        if xml_file.endswith('.xml'):
+            names = subdir.split('\\')
+            date = 'date{}'.format(names[1])
+            collection s= db[date]
+            chain = names[2]
+            branch = names[3]
+            content_type = xml_file[0:5]
+            xml_path = "{}\\{}".format(subdir,xml_file)
+            with open (xml_path) as f:
+                prices_dict = xtd.parse(f)
+            mongo_dict = dict(date = date,
+                              chain = chain,
+                              branch = branch,
+                              content_type = content_type,
+                              content = prices_dict)
+            collection.insert(mongo_dict)
+            print ('file OK')
 
