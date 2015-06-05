@@ -28,9 +28,14 @@ public class AggregateFileValidator {
       return false;
 
     String branchId = getBranchId(fileName);
-    return (!downloadedFilesByBranch.containsKey(branchId) || !downloadedFilesByBranch
-        .get(branchId).contains(
-            fileName.substring(0, fileName.lastIndexOf("."))));
+    
+    String substring_version = null;
+    if (fileName.lastIndexOf(".") >= 0)
+    	substring_version = fileName.substring(0, fileName.lastIndexOf("."));
+    
+    return (!downloadedFilesByBranch.containsKey(branchId) || 
+    		(substring_version != null && !downloadedFilesByBranch.get(branchId).contains(substring_version))
+            );
   }
 
   public static synchronized String getBranchId(String fileName) {

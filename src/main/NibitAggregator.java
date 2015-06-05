@@ -12,6 +12,8 @@ import main.PricesAggregatorApp.AggregatorType;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.gargoylesoftware.htmlunit.Page;
+import com.gargoylesoftware.htmlunit.ScriptResult;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlDivision;
@@ -142,10 +144,15 @@ public abstract class NibitAggregator extends Aggregator {
 
   private void downloadFromRow(HtmlTableRow row, AggregatorWebClient webClient,
       HtmlPage page) throws IOException {
+	  
+	  
     HtmlAnchor a = (HtmlAnchor) row.getElementsByTagName("a").get(0);
-    a.click();
-    // Page page2 = a.click();
-    // webClient.handleContentChanged(page2.getWebResponse());
+    //a.click();
+     Page page2 = a.click();
+     webClient.handleContentChanged(page2.getWebResponse());
+     webClient.getWebWindows().get(0).getHistory().back();
+
+     
   }
 
   private String parseNibitFileName(String textContent) {
