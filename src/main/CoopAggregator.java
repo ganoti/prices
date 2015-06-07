@@ -1,7 +1,6 @@
 package main;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,7 +56,7 @@ public class CoopAggregator extends Aggregator {
       promosThread.join();
       storesThread.join();
     } catch (InterruptedException e) {
-      e.printStackTrace();
+      //e.printStackTrace();
     }
   }
 
@@ -78,7 +77,7 @@ public class CoopAggregator extends Aggregator {
           logger.info("Aggregating prices in page: קואופ ישראל - Coop Israel");
 
           // Current page:
-          // Title=קואופ ישראל - Coop Israel
+          // Title=׳§׳•׳�׳•׳₪ ׳™׳©׳¨׳�׳� - Coop Israel
           // URL=http://coopisrael.coop/home/prices
 
           selectXmlType(page);
@@ -109,8 +108,7 @@ public class CoopAggregator extends Aggregator {
               else {
                 logger
                     .severe("Quit attempts to download stores-files after 5 times"
-                        + "\n Exception thrown:" + e1.getMessage());
-                e1.printStackTrace();
+                        + "\n Exception thrown:" + e1.getMessage() + Aggregator.stacktraceToString(e1));
                 break;
               }
             }
@@ -122,15 +120,9 @@ public class CoopAggregator extends Aggregator {
 
           webClient.close();
 
-        } catch (MalformedURLException e1) {
-          logger.severe("MalformedURLException thrown:" + e1.getMessage());
-          e1.printStackTrace();
-        } catch (IOException e1) {
-          logger.severe("IOException thrown:" + e1.getMessage());
-          e1.printStackTrace();
         } catch (Exception e) {
-          logger.severe("General exception thrown:" + e.getMessage());
-          e.printStackTrace();
+          logger.severe(e.getClass().toString() + " thrown:" + e.getMessage() + Aggregator.stacktraceToString(e));
+          
         }
       }
 
@@ -156,7 +148,7 @@ public class CoopAggregator extends Aggregator {
           logger.info("Aggregating prices in page: קואופ ישראל - Coop Israel");
 
           // Current page:
-          // Title=קואופ ישראל - Coop Israel
+          // Title=׳§׳•׳�׳•׳₪ ׳™׳©׳¨׳�׳� - Coop Israel
           // URL=http://coopisrael.coop/home/prices
 
           selectXmlType(page);
@@ -179,15 +171,8 @@ public class CoopAggregator extends Aggregator {
 
           webClient.close();
 
-        } catch (MalformedURLException e1) {
-          logger.severe("MalformedURLException thrown:" + e1.getMessage());
-          e1.printStackTrace();
-        } catch (IOException e1) {
-          logger.severe("IOException thrown:" + e1.getMessage());
-          e1.printStackTrace();
         } catch (Exception e) {
-          logger.severe("General exception thrown:" + e.getMessage());
-          e.printStackTrace();
+            logger.severe(e.getClass().toString() +  " thrown:" + e.getMessage() + Aggregator.stacktraceToString(e));
         }
       }
 
@@ -235,15 +220,8 @@ public class CoopAggregator extends Aggregator {
 
           webClient.close();
 
-        } catch (MalformedURLException e1) {
-          logger.severe("MalformedURLException thrown:" + e1.getMessage());
-          e1.printStackTrace();
-        } catch (IOException e1) {
-          logger.severe("IOException thrown:" + e1.getMessage());
-          e1.printStackTrace();
         } catch (Exception e) {
-          logger.severe("General exception thrown:" + e.getMessage());
-          e.printStackTrace();
+          logger.severe(e.getClass().toString() +  " thrown:" + e.getMessage() + Aggregator.stacktraceToString(e));
         }
       }
 
@@ -282,8 +260,8 @@ public class CoopAggregator extends Aggregator {
           logger.severe("Quit attempts after more than 5 times, for branch: "
               + branch.getTextContent() + ", data-id: "
               + branch.getAttribute("data-id") + "\n Exception thrown:"
-              + e1.getMessage());
-          e1.printStackTrace();
+              + e1.getMessage() + Aggregator.stacktraceToString(e1));
+          
           break;
         }
       }

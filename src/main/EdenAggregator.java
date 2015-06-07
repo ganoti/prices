@@ -1,7 +1,6 @@
 package main;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
@@ -85,21 +84,8 @@ public class EdenAggregator extends Aggregator {
         }
       }
 
-    } catch (FailingHttpStatusCodeException e1) {
-      logger.severe("FailingHttpStatusCodeException thrown:" + e1.getMessage());
-      e1.printStackTrace();
-
-    } catch (MalformedURLException e1) {
-      logger.severe("MalformedURLException thrown:" + e1.getMessage());
-      e1.printStackTrace();
-
-    } catch (IOException e1) {
-      logger.severe("IOException thrown:" + e1.getMessage());
-      e1.printStackTrace();
-
     } catch (Exception e) {
-      logger.severe("General exception thrown:" + e.getMessage());
-      e.printStackTrace();
+      logSevere(e, "aggregatePricesAndPromos");
     } finally {
       webClient.close();
     }

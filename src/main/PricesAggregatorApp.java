@@ -84,7 +84,8 @@ public class PricesAggregatorApp {
 	  try {
 	    	CommandLineParser parser = new DefaultParser();
 	        CommandLine line = parser.parse(generateCLIOptions(), args);
-			if (line.hasOption("debug")) ; //Mark the debug flag
+			if (line.hasOption("debug")) 
+				logger.setLevel(Level.ALL); 
 			
 			String chain = line.getOptionValue("chain");
 	        String agg   = line.getOptionValue("type");
