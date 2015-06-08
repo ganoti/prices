@@ -112,21 +112,8 @@ public abstract class CerberusAggregator extends Aggregator {
         }
       }
 
-    } catch (FailingHttpStatusCodeException e1) {
-      logger.severe("FailingHttpStatusCodeException thrown:" + e1.getMessage());
-      e1.printStackTrace();
-
-    } catch (MalformedURLException e1) {
-      logger.severe("MalformedURLException thrown:" + e1.getMessage());
-      e1.printStackTrace();
-
-    } catch (IOException e1) {
-      logger.severe("IOException thrown:" + e1.getMessage());
-      e1.printStackTrace();
-
     } catch (Exception e) {
-      logger.severe("General exception thrown:" + e.getMessage());
-      e.printStackTrace();
+    	logSevere(e, "aggregatePricesAndPromos");
     }
   }
 

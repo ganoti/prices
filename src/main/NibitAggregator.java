@@ -1,7 +1,6 @@
 package main;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -123,21 +122,8 @@ public abstract class NibitAggregator extends Aggregator {
         }
       }
 
-    } catch (FailingHttpStatusCodeException e1) {
-      logger.severe("FailingHttpStatusCodeException thrown:" + e1.getMessage());
-      e1.printStackTrace();
-
-    } catch (MalformedURLException e1) {
-      logger.severe("MalformedURLException thrown:" + e1.getMessage());
-      e1.printStackTrace();
-
-    } catch (IOException e1) {
-      logger.severe("IOException thrown:" + e1.getMessage());
-      e1.printStackTrace();
-
-    } catch (Exception e) {
-      logger.severe("General exception thrown:" + e.getMessage());
-      e.printStackTrace();
+    }  catch (Exception e) {
+    	logSevere(e, "aggregatePricesAndPromos");    
     }
 
   }

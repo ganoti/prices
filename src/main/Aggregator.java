@@ -3,6 +3,7 @@ package main;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Date;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -19,6 +20,17 @@ public abstract class Aggregator {
   private Date startAgg;
   protected AggregateFileValidator fileValidator;
 
+  void logSevere(Exception e , String funcName) {
+		logger.severe(String.format("%s() caught exception: %s , %s.\n %s\n",funcName,e.getClass().toString(),e.getMessage(), stacktraceToString(e)));
+  }
+  
+  public static String stacktraceToString(Exception e) {
+	  StringWriter w = new StringWriter();
+		PrintWriter pw = new PrintWriter(w);
+		e.printStackTrace(pw);
+		return w.toString();
+  }
+  
   public void aggregate(String sessionDir) {
     this.startAgg = new Date();
     this.sessionDir = sessionDir;
@@ -30,7 +42,7 @@ public abstract class Aggregator {
       logger.addHandler(fh);
       logger.setLevel(Level.WARNING);
     } catch (SecurityException | IOException e) {
-      e.printStackTrace();
+    	logSevere(e, "aggregate");
     }
 
     if (sessionDir.contains(AggregatorType.daily.toString())) {
@@ -48,9 +60,7 @@ public abstract class Aggregator {
           new AggregateFileValidator(aggType, getChainName(), sessionDir);
       aggregatePricesAndPromos();
     } catch (Exception e) {
-      logger.severe("Exception in aggregatePricesAndPromos(): "
-          + e.getMessage());
-      e.printStackTrace();
+    	logSevere(e, "aggregatePricesAndPromos");
     }
 
     // writing README file for this aggregation session
@@ -65,8 +75,7 @@ public abstract class Aggregator {
       out.println(getReadmeDescription());
       out.close();
     } catch (FileNotFoundException e) {
-      System.err.println("Error while writing README file. " + e.getMessage());
-      e.printStackTrace();
+    	logSevere(e, "aggregate");
     }
   }
 

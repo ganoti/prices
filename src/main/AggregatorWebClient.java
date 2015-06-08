@@ -37,14 +37,14 @@ public class AggregatorWebClient extends WebClient {
 
   private String outputDir;
 
-  Logger logger;
+  final Logger logger;
 
   public AggregatorWebClient(BrowserVersion bv, String outputDir,
-      AggregatorType aggType, Logger logger) {
+      AggregatorType aggType, Logger logger_) {
     super(bv);
 
     this.outputDir = outputDir;
-    this.logger = logger;
+    this.logger = logger_;
     getOptions().setThrowExceptionOnScriptError(false);
 
     ConfirmHandler okHandler = new ConfirmHandler() {
@@ -65,7 +65,11 @@ public class AggregatorWebClient extends WebClient {
 
       @Override
       public void webWindowContentChanged(WebWindowEvent event) {
-        handleContentChanged(event.getNewPage().getWebResponse());
+        try {
+			handleContentChanged(event.getNewPage().getWebResponse());
+		} catch (IOException e) {
+			logger.severe(String.format("webWindowContentChanged() caught exception: %s , %s.\n %s\n",e.getClass().toString(),e.getMessage(), Aggregator.stacktraceToString(e)));
+		}
       }
 
       @Override
@@ -82,7 +86,7 @@ public class AggregatorWebClient extends WebClient {
         Level.OFF);
   }
 
-  public void handleContentChanged(WebResponse response) {
+  public void handleContentChanged(WebResponse response) throws IOException {
     String contentType = response.getContentType();
     if (contentType.startsWith("text/xml")) {
       handleXmlResponse(response);
@@ -94,7 +98,7 @@ public class AggregatorWebClient extends WebClient {
     }
   }
 
-  public void handleCompressedFileResponse(WebResponse response) {
+  public void handleCompressedFileResponse(WebResponse response) throws IOException {
     String fileName = getCompressedFileName(response);
 
     if (fileName.endsWith(".gz") || fileName.endsWith("zip")) {
@@ -131,25 +135,17 @@ public class AggregatorWebClient extends WebClient {
           outputStream.write(bytes2, 0, read);
         }
       } catch (IOException e) {
-        logger.severe("Exception while saving gz file " + fileName + "\n"
-            + e.getClass() + ", " + e.getMessage());
-        e.printStackTrace();
+        throw e;
       } finally {
         if (inputStream != null) {
           try {
             inputStream.close();
-          } catch (IOException e) {
-            logger.severe(e.getClass() + ", " + e.getMessage());
-            e.printStackTrace();
-          }
+          } catch (IOException e) {} //We dont care if we got an error closing a stream
         }
         if (outputStream != null) {
           try {
             outputStream.close();
-          } catch (IOException e) {
-            logger.severe(e.getClass() + ", " + e.getMessage());
-            e.printStackTrace();
-          }
+          } catch (IOException e) {}//We dont care if we got an error closing a stream
         }
       }
     }
@@ -211,25 +207,19 @@ public class AggregatorWebClient extends WebClient {
             + e.getMessage());
       }
     } catch (IOException e) {
-      logger.severe("Exception while saving xml. " + e.getClass() + ", "
-          + e.getMessage());
-      e.printStackTrace();
+    	logger.severe("Exception while saving xml. " + e.getClass() + ", "
+          + e.getMessage() + Aggregator.stacktraceToString(e));
+      
     } finally {
       if (inputStream != null) {
         try {
           inputStream.close();
-        } catch (IOException e) {
-          logger.severe(e.getClass() + ", " + e.getMessage());
-          e.printStackTrace();
-        }
+        } catch (IOException e) {        }
       }
       if (outputStream != null) {
         try {
           outputStream.close();
-        } catch (IOException e) {
-          logger.severe(e.getClass() + ", " + e.getMessage());
-          e.printStackTrace();
-        }
+        } catch (IOException e) {        }
 
       }
     }
