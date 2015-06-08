@@ -14,23 +14,26 @@ import main.PricesAggregatorApp.ChainName;
 
 public abstract class Aggregator {
 
+  private static final String VERSION = "1.1";
   protected Logger logger = Logger.getLogger(getClass().getName());
   protected String sessionDir;
   protected AggregatorType aggType;
   private Date startAgg;
   protected AggregateFileValidator fileValidator;
 
-  void logSevere(Exception e , String funcName) {
-		logger.severe(String.format("%s() caught exception: %s , %s.\n %s\n",funcName,e.getClass().toString(),e.getMessage(), stacktraceToString(e)));
+  void logSevere(Exception e, String funcName) {
+    logger.severe(String.format("%s() caught exception: %s , %s.\n %s\n",
+        funcName, e.getClass().toString(), e.getMessage(),
+        stacktraceToString(e)));
   }
-  
+
   public static String stacktraceToString(Exception e) {
-	  StringWriter w = new StringWriter();
-		PrintWriter pw = new PrintWriter(w);
-		e.printStackTrace(pw);
-		return w.toString();
+    StringWriter w = new StringWriter();
+    PrintWriter pw = new PrintWriter(w);
+    e.printStackTrace(pw);
+    return w.toString();
   }
-  
+
   public void aggregate(String sessionDir) {
     this.startAgg = new Date();
     this.sessionDir = sessionDir;
@@ -42,7 +45,7 @@ public abstract class Aggregator {
       logger.addHandler(fh);
       logger.setLevel(Level.WARNING);
     } catch (SecurityException | IOException e) {
-    	logSevere(e, "aggregate");
+      logSevere(e, "aggregate");
     }
 
     if (sessionDir.contains(AggregatorType.daily.toString())) {
@@ -60,23 +63,37 @@ public abstract class Aggregator {
           new AggregateFileValidator(aggType, getChainName(), sessionDir);
       aggregatePricesAndPromos();
     } catch (Exception e) {
-    	logSevere(e, "aggregatePricesAndPromos");
+      logSevere(e, "aggregatePricesAndPromos");
     }
 
     // writing README file for this aggregation session
     try {
       PrintWriter out = new PrintWriter(sessionDir + "/" + "README.txt");
       out.println("Aggregator: " + getClass().getName());
+      out.println("Software version: " + VERSION);
       out.println("Start time: " + startAgg);
       out.println("End time: " + new Date());
       out.println("aggType: " + aggType);
       out.println();
       out.println("Description: ");
       out.println(getReadmeDescription());
+      out.println(getSoftwareVersionDescription());
       out.close();
     } catch (FileNotFoundException e) {
-    	logSevere(e, "aggregate");
+      logSevere(e, "aggregate");
     }
+  }
+
+  private String getSoftwareVersionDescription() {
+    String lineSeparator = System.getProperty("line.separator");
+    StringBuilder sb =
+        new StringBuilder()
+            .append("Software version: " + VERSION)
+            .append(lineSeparator)
+            .append(
+                "Added Eden aggregator and fixed Shufersal (and changed 3 Nibit aggregators, but they are still not correct, see their README for more details.).")
+            .append(lineSeparator);
+    return sb.toString();
   }
 
   protected abstract void aggregatePricesAndPromos();

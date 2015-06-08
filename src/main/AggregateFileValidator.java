@@ -28,14 +28,13 @@ public class AggregateFileValidator {
       return false;
 
     String branchId = getBranchId(fileName);
-    
+
     String substring_version = null;
     if (fileName.lastIndexOf(".") >= 0)
-    	substring_version = fileName.substring(0, fileName.lastIndexOf("."));
-    
-    return (!downloadedFilesByBranch.containsKey(branchId) || 
-    		(substring_version != null && !downloadedFilesByBranch.get(branchId).contains(substring_version))
-            );
+      substring_version = fileName.substring(0, fileName.lastIndexOf("."));
+
+    return (!downloadedFilesByBranch.containsKey(branchId) || (substring_version != null && !downloadedFilesByBranch
+        .get(branchId).contains(substring_version)));
   }
 
   public static synchronized String getBranchId(String fileName) {
@@ -54,7 +53,7 @@ public class AggregateFileValidator {
    * @param row
    * @return
    */
-  private boolean isFromToday(String rowId) {
+  public boolean isFromToday(String rowId) {
     try {
       String[] t = rowId.split("-");
       String rowDate;

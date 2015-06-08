@@ -1,6 +1,5 @@
 package main;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -10,12 +9,12 @@ import java.util.Set;
 import main.PricesAggregatorApp.AggregatorType;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.Page;
-import com.gargoylesoftware.htmlunit.ScriptResult;
 import com.gargoylesoftware.htmlunit.WebResponse;
+import com.gargoylesoftware.htmlunit.html.DomElement;
+import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlDivision;
+import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlOption;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSelect;
@@ -35,13 +34,15 @@ public abstract class NibitAggregator extends Aggregator {
   private static final String URL_NIBIT =
       "http://matrixcatalog.co.il/NBCompetitionRegulations.aspx";
 
-  private int branchesCnt_prices = 0;
+  private int pricesCnt = 0;
   private Set<String> branchesFailed_prices = new HashSet<String>();
 
-  private int branchesCnt_promos = 0;
+  private int promosCnt = 0;
   private Set<String> branchesFailed_promos = new HashSet<String>();
 
   private int storesCnt = 0;
+
+  private String lastAggFile = "";
 
   @Override
   protected void aggregatePricesAndPromos() {
@@ -73,72 +74,106 @@ public abstract class NibitAggregator extends Aggregator {
     try {
       HtmlPage page = webClient.getPage(URL_NIBIT);
 
-      page = selectChain(page, getChainCode());
+      // page = selectChain(page, getChainCode());
 
-      setCurrentDate(page);
+      // setCurrentDate(page);
 
-      page = hitSearchButton(page);
-      int js = webClient.waitForBackgroundJavaScript(0);
-      while (js > 1) {
-        js = webClient.waitForBackgroundJavaScript(1000);
-        logger.info("Javascript processes: " + js + ". still waiting...");
-      }
+      // page = hitSearchButton(page);
+      // int js = webClient.waitForBackgroundJavaScript(0);
+      // while (js > 1) {
+      // js = webClient.waitForBackgroundJavaScript(1000);
+      // logger.info("Javascript processes: " + js + ". still waiting...");
+      // }
 
-      HtmlDivision tableDiv =
-          (HtmlDivision) page.getElementById("download_content");
-      HtmlTable filesTable =
-          (HtmlTable) tableDiv.getElementsByTagName("table").get(0);
+      HtmlAnchor a;
+      String fileName;
+      boolean finish = false;
 
-      List<HtmlTableRow> rows = filesTable.getRows();
-      logger.info("Found " + rows.size() + " rows in file-table. ");
-      for (HtmlTableRow row : rows) {
-        String fileName = parseNibitFileName(row.getCell(0).getTextContent());
-        if (fileName != null) {
-          if (fileValidator.shouldAggregateFile(fileName)) {
-            if (aggType.equals(AggregatorType.daily)) {
-              if (fileName.startsWith("PriceFull")) {
-                downloadFromRow(row, webClient, page);
-                branchesCnt_prices++;
-              } else if (fileName.startsWith("PromoFull")) {
-                downloadFromRow(row, webClient, page);
-                branchesCnt_promos++;
-              } else if (fileName.startsWith("Store")) {
-                downloadFromRow(row, webClient, page);
-                storesCnt++;
+      while (!finish) {
+        HtmlDivision tableDiv =
+            (HtmlDivision) page.getElementById("download_content");
+        HtmlTable filesTable =
+            (HtmlTable) tableDiv.getElementsByTagName("table").get(0);
+
+        DomNodeList<HtmlElement> anchorList =
+            filesTable.getElementsByTagName("a");
+
+        for (DomElement domElement : anchorList) {
+          if (finish)
+            break;
+          // TODO fix: Some of other's Nibit chains will be collected, and maybe
+          // not all this Nibit chain files are collected. Need to see why.
+          fileName = null;
+          a = (HtmlAnchor) domElement;
+          if (a.getParentNode().getNodeName().equals("td")
+              && a.getParentNode().getParentNode().getNodeName().equals("tr")) {
+            fileName =
+                parseNibitFileName(((HtmlTableRow) a.getParentNode()
+                    .getParentNode()).getCell(0).getTextContent());
+          }
+
+          if (fileName != null) {
+            if (!fileValidator.isFromToday(fileName)) {
+              finish = true; // stop iterating forward on table's pages
+            } else if (!fileValidator.shouldAggregateFile(fileName)) {
+              finish = true;
+            } else if (fileName.contains(getChainCode())) {
+              boolean downloaded = true;
+              if (aggType.equals(AggregatorType.daily)) {
+                if (fileName.startsWith("PriceFull")) {
+                  a.click();
+                  pricesCnt++;
+                } else if (fileName.startsWith("PromoFull")) {
+                  a.click();
+                  promosCnt++;
+                } else if (fileName.startsWith("Store")) {
+                  a.click();
+                  storesCnt++;
+                } else {
+                  downloaded = false;
+                }
+              } else if (aggType.equals(AggregatorType.hourly)) {
+                if (fileName.startsWith("Price")
+                    && !fileName.startsWith("PriceFull")) {
+                  a.click();
+                  pricesCnt++;
+                } else if (fileName.startsWith("Promo")
+                    && !fileName.startsWith("PromoFull")) {
+                  a.click();
+                  promosCnt++;
+                } else {
+                  downloaded = false;
+                }
+              } else {
+                throw new AggregatorException("Not supported aggType: "
+                    + aggType);
               }
-            } else if (aggType.equals(AggregatorType.hourly)) {
-              if (fileName.startsWith("Price")
-                  && !fileName.startsWith("PriceFull")) {
-                downloadFromRow(row, webClient, page);
-                branchesCnt_prices++;
-              } else if (fileName.startsWith("Promo")
-                  && !fileName.startsWith("PromoFull")) {
-                downloadFromRow(row, webClient, page);
-                branchesCnt_promos++;
+              if (downloaded) {
+                webClient.getWebWindows().get(0).getHistory().back();
+                lastAggFile = fileName;
               }
-            } else
-              throw new AggregatorException("Not supported aggType: " + aggType);
+            }
+          }
+        }
+
+        if (!finish) {
+          // move to next table page
+          if (page.getElementById("MainContent_btnNext2") != null
+              && !((HtmlSubmitInput) page
+                  .getElementById("MainContent_btnNext2")).isDisabled()) {
+            page =
+                ((HtmlSubmitInput) page.getElementById("MainContent_btnNext2"))
+                    .click();
+          } else {
+            finish = true;
           }
         }
       }
 
-    }  catch (Exception e) {
-    	logSevere(e, "aggregatePricesAndPromos");    
+    } catch (Exception e) {
+      logSevere(e, "aggregatePricesAndPromos");
     }
 
-  }
-
-  private void downloadFromRow(HtmlTableRow row, AggregatorWebClient webClient,
-      HtmlPage page) throws IOException {
-	  
-	  
-    HtmlAnchor a = (HtmlAnchor) row.getElementsByTagName("a").get(0);
-    //a.click();
-     Page page2 = a.click();
-     webClient.handleContentChanged(page2.getWebResponse());
-     webClient.getWebWindows().get(0).getHistory().back();
-
-     
   }
 
   private String parseNibitFileName(String textContent) {
@@ -200,8 +235,61 @@ public abstract class NibitAggregator extends Aggregator {
 
   @Override
   protected String getReadmeDescription() {
-    // TODO Auto-generated method stub
-    return null;
-  }
+    String lineSeperator = System.getProperty("line.separator");
+    StringBuilder sb =
+        new StringBuilder()
+            .append("Aggregated prices and promos from page : ")
+            .append(URL_NIBIT)
+            .append(lineSeperator)
+            .append("For chain code: ")
+            .append(getChainCode())
+            .append(", name: ")
+            .append(getChainName())
+            .append(lineSeperator)
+            .append(
+                "Iterates over the links in the main table, and aggregates:")
+            .append(lineSeperator)
+            .append("In Daily mode: ")
+            .append(
+                "PromosFull, PricesFull and Stores files, of the current day and which have not yet been ")
+            .append("aggregated earlier today,")
+            .append(lineSeperator)
+            .append(
+                "And in Hourly mode: same as daily mode, but files starting with Promos and Prices.")
+            .append(lineSeperator)
+            .append(
+                "Assumes the rows in table are sorted in decreasing order of time, and stop iterating over the table-pages when reach a row from yesterday")
+            .append(lineSeperator)
+            .append("Last aggregated file: ")
+            .append(lastAggFile)
+            .append(
+                "Time stamp and branches are parsed from the value in the \"Name\" column.")
+            .append(lineSeperator)
+            .append(
+                "We don't filter the table because the links forced us to press the \"back\" button in webClient, and this resets the filter. ")
+            .append(lineSeperator)
+            .append(lineSeperator)
+            .append(
+                "Notice: after the first table-page does not work correctly. Some of other's Nibit chains will be collected, and maybe not all this Nibit chain files are collected. ")
+            .append(lineSeperator)
+            .append(lineSeperator)
+            .append("A total of ")
+            .append(pricesCnt)
+            .append(" prices files were downloaded successfully")
+            .append(lineSeperator)
+            .append("A total of ")
+            .append(promosCnt)
+            .append(" promos files were downloaded successfully")
+            .append(lineSeperator)
+            .append("A total of ")
+            .append(storesCnt)
+            .append(" stores files were downloaded successfully")
+            .append(lineSeperator)
+            .append(lineSeperator)
+            .append(
+                "Warning and Errors are logged to err.log at: "
+                    + this.sessionDir);
 
+    return sb.toString();
+  }
 }
