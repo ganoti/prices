@@ -1,5 +1,6 @@
 package main;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -169,7 +170,6 @@ public abstract class NibitAggregator extends Aggregator {
           }
         }
       }
-
     } catch (Exception e) {
       logSevere(e, "aggregatePricesAndPromos");
     }

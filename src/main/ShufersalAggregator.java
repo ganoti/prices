@@ -66,9 +66,9 @@ public class ShufersalAggregator extends Aggregator {
       }
 
     } catch (Exception e) {
-      logger.severe("Exception in ShufersalAggregator. " + e.getClass() + ", "
-          + e.getMessage());
-      e.printStackTrace();
+      logSevere(e, "aggregatePricesAndPromos");
+    } finally {
+      webClient.close();
     }
   }
 
@@ -125,7 +125,7 @@ public class ShufersalAggregator extends Aggregator {
           logger.severe("IOException thrown:" + e1.getMessage());
           e1.printStackTrace();
         } catch (Exception e) {
-        	logSevere(e, "saveTableRows");
+          logSevere(e, "saveTableRows");
         } finally {
           webClient.close();
         }

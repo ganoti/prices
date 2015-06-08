@@ -77,12 +77,6 @@ public class CoopAggregator extends Aggregator {
           logger
               .info("Aggregating prices in page: ×§×•×�×•×¤ ×™×©×¨×�×œ - Coop Israel");
 
-          // Current page:
-          // Title=×§×•×�×•×¤ ×™×©×¨×�×œ - Coop Israel
-          // Title=׳§׳•׳�׳•׳₪ ׳™׳©׳¨׳�׳� - Coop Israel
-          // Title=׳§׳•׳�׳•׳₪ ׳™׳©׳¨׳�׳� - Coop Israel
-          // URL=http://coopisrael.coop/home/prices
-
           selectXmlType(page);
 
           checkAgreeBox(page);

@@ -34,6 +34,17 @@ public abstract class Aggregator {
     return w.toString();
   }
 
+  void logSevere(Exception e , String funcName) {
+		logger.severe(String.format("%s() caught exception: %s , %s.\n %s\n",funcName,e.getClass().toString(),e.getMessage(), stacktraceToString(e)));
+  }
+  
+  public static String stacktraceToString(Exception e) {
+	  StringWriter w = new StringWriter();
+		PrintWriter pw = new PrintWriter(w);
+		e.printStackTrace(pw);
+		return w.toString();
+  }
+  
   public void aggregate(String sessionDir) {
     this.startAgg = new Date();
     this.sessionDir = sessionDir;
