@@ -1,6 +1,8 @@
 # prices
 
-README – prices project 
+
+CURRENTLY THE PROJECT ON GITHUB IS NOT UPDATED AND DOES NOT COMPILE. 
+WE WILL TRY TO UPDATE GITHUB SOON WITH THE UPDATED PROJECT.
 
 The PricesAggregatorApp aggregates XML files that food-store chains publish on the web as a part of the 
 “prices-transparency” new law in Israel. This app is executed every hour on the Hebrew University servers. It runs for a 
