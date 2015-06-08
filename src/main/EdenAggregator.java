@@ -14,23 +14,14 @@ import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import main.PricesAggregatorApp.AggregatorType;
+
 import main.PricesAggregatorApp.ChainName;
 
 public class EdenAggregator extends Aggregator {
-  
-  private static final String URL_EDEN = "http://operations.edenteva.co.il/Prices/index";
-  
-  private int branchesCnt_prices = 0;
-  private Set<String> branchesFailed_prices = new HashSet<String>();
-
-  private int branchesCnt_promos = 0;
-  private Set<String> branchesFailed_promos = new HashSet<String>();
-
-  private int storesCnt = 0;
 
   @Override
   protected void aggregatePricesAndPromos() {
-    String path = sessionDir;
+    // TODO Auto-generated method stub
 
     AggregatorWebClient webClient =
         new AggregatorWebClient(BrowserVersion.FIREFOX_31, path, aggType,
@@ -98,63 +89,14 @@ public class EdenAggregator extends Aggregator {
 
   @Override
   protected String getReadmeDescription() {
-    String lineSeperator = System.getProperty("line.separator");
-    StringBuilder sb =
-        new StringBuilder()
-            .append("Aggregated prices and promos from page : ")
-            .append(URL_EDEN)
-            .append(lineSeperator)
-            .append(
-                "Iterates over all html-anchors (elements with tag name \"a\" found in the page), of which their text-content ends with \"zip\".")
-            .append(lineSeperator)
-            .append(
-                "This content is the file name, and branches as well as time-stamps are parsed from these file names.")
-            .append(lineSeperator)
-            .append(
-                "Xml files are extracted from the .zip files, and are saved in their original name.")
-            .append(lineSeperator)
-            .append(
-                " The gz files are: all gz files that start with either \"PriceFull\" or \"PromoFull\" in Daily mode, or with either \"Price\" or \"Promo\" (but do not continue with \"Full\"), in the hourly mode,")
-            .append(lineSeperator)
-            .append(
-                "but have not yet been collected earlier in the same day (determined by the file names stored ealier today).")
-            .append(lineSeperator).append(lineSeperator)
-            .append("The following was downloaded: ").append(lineSeperator)
-            .append("(1) Prices: ").append(lineSeperator);
-    if (branchesFailed_prices.isEmpty()) {
-      sb.append("All prices downloaded successfully");
-    } else {
-      sb.append("ERROR! The following branches failed to download prices: ");
-      for (String branchId : branchesFailed_prices) {
-        sb.append(branchId).append("; ");
-      }
-    }
-    // TODO: specify how many prices for each branch
-    sb.append(lineSeperator).append("A total of ").append(branchesCnt_prices)
-        .append(" branches prices downloaded successfully")
-        .append(lineSeperator);
-
-    sb.append("(2) Promos: ").append(lineSeperator);
-    if (branchesFailed_promos.isEmpty()) {
-      sb.append("All promos downloaded successfully.");
-    } else {
-      sb.append("ERROR! The following branches failed to download promos: ");
-      for (String branchId : branchesFailed_promos) {
-        sb.append(branchId).append("; ");
-      }
-    }
-    // TODO: specify how many promos for each branch
-    sb.append(lineSeperator).append("A total of ").append(branchesCnt_promos)
-        .append(" branches promos downloaded successfully.")
-        .append(lineSeperator);
-    if (aggType.equals(AggregatorType.daily)) {
-      sb.append("(3) Stores-files: ").append(storesCnt)
-          .append(" files were saved.").append(lineSeperator);
-    }
-
-    sb.append(lineSeperator).append(
-        "Warning and Errors are logged to err.log at: " + this.sessionDir);
-
-    return sb.toString();
+    // TODO Auto-generated method stub
+    return null;
   }
+
+  @Override
+  protected ChainName getChainName() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

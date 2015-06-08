@@ -3,11 +3,8 @@ package main;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.apache.commons.cli.*;
 
 public class PricesAggregatorApp {
 
@@ -30,96 +27,16 @@ public class PricesAggregatorApp {
 
   static Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-  static Options generateCLIOptions() {
-	  Options op = new Options();
-	  op.addOption("debug","Output all information to STDOUT");
-	  Option type = new Option("type","Download type. Either hourly or daily");
-	  type.setArgs(1);
-	  type.setRequired(true);
-	  op.addOption(type);
-	  
-	  Option chain = new Option("chain","Chain name");
-	  StringBuilder sb = new StringBuilder();
-	  for (ChainName c : ChainName.values())
-		  sb.append(String.format("%s,",c.toString()));
-	  chain.setDescription(String.format("Chain name.\nPossibilities: %s", sb.toString()));
-	  chain.setRequired(true);
-	  chain.setArgs(1);
-	  op.addOption(chain);
-	  
-	  return op;
-  }
-  
-  public static Aggregator createAggregator(ChainName n) {
-	  Aggregator result=  null;  
-	  Hashtable<ChainName, Class<? extends Aggregator>> table = new Hashtable<PricesAggregatorApp.ChainName, Class<? extends Aggregator>>();;
-	    table.put(ChainName.coop , CoopAggregator.class);
-	    table.put(ChainName.bitan, BitanAggregator.class);
-	    table.put(ChainName.dor, DoralonAggregator.class);
-	    table.put(ChainName.dosh, DoshAggregator.class);
-	    table.put(ChainName.eden, EdenAggregator.class);
-	    table.put(ChainName.hashuk, HashukAggregator.class);
-	    table.put(ChainName.hazi, HaziHinamAggregator.class);
-	    table.put(ChainName.keshet, KeshetAggregator.class);
-	    table.put(ChainName.lahav, LahavAggregator.class);
-	    table.put(ChainName.mega, MegaAggregator.class);
-	    table.put(ChainName.osher, OsheradAggregator.class);
-	    table.put(ChainName.rami, RamiAggregator.class);
-	    table.put(ChainName.shuf, ShufersalAggregator.class);
-	    table.put(ChainName.tiv, TivTaamAggregator.class);
-	    table.put(ChainName.victory, VictoryAggregator.class);
-	    table.put(ChainName.yohan, YohananofAggregator.class);
-	    
-	    Class <? extends Aggregator> ag = table.get(n);
-	  try {
-		result = ag.newInstance();
-	  } catch (Exception e) {
-		//Could never happen
-		e.printStackTrace();
-	  } 
-	  return result;
-  }
-  
-  static void parseArgs(String [] args) {
-	  try {
-	    	CommandLineParser parser = new DefaultParser();
-	        CommandLine line = parser.parse(generateCLIOptions(), args);
-			if (line.hasOption("debug")) 
-				logger.setLevel(Level.ALL); 
-			
-			String chain = line.getOptionValue("chain");
-	        String agg   = line.getOptionValue("type");
-			
-			try {
-	            aggType = Enum.valueOf(AggregatorType.class, agg.toLowerCase());
-	          } catch (Exception e) {
-	            throw new ParseException(
-	                "Illegal aggtype arg. Two possible values: daily or hourly.");
-	          }
-			try {
-	            chainName = Enum.valueOf(ChainName.class, chain.toLowerCase());
-	          } catch (Exception e) {
-	           
-	            throw new ParseException("Illegal chain arg.");
-	          }
-			
-	    } catch (ParseException e) {
-	        System.err.println( "Parsing failed.  Reason: " + e.getMessage() );
-	        HelpFormatter h = new HelpFormatter();
-			h.printHelp("PriceAggregator", generateCLIOptions());
-	        System.exit(-1);;
-		}
-  }
-  
   /**
    * 
    * @param args type=daily/hourly chain=coop/rami/...
    */
   public static void main(String args[]) {
+
     logger.setLevel(Level.WARNING);
 
-    
-    parseArgs(args);
+    if (!parseArgs(args))
+      return;
 
     /** determine session path **/
 
@@ -148,12 +65,148 @@ public class PricesAggregatorApp {
 
     /** Executing the chain's aggregator **/
 
-    Aggregator ag = createAggregator(chainName);
-    logger.info("Excecuting " + ag.getChainName() + " Aggregator. ");
-    ag.aggregate(sessionPath);
+    switch (chainName) {
+    case coop:
+      CoopAggregator coop = new CoopAggregator();
+      logger.info("Excecuting " + coop.getChainName() + " Aggregator. ");
+      coop.aggregate(sessionPath);
+      break;
+    case rami:
+      RamiAggregator rami = new RamiAggregator();
+      logger.info("Excecuting " + rami.getChainName() + " Aggregator. ");
+      rami.aggregate(sessionPath);
+      break;
+    case dosh:
+      DoshAggregator dosh = new DoshAggregator();
+      logger.info("Excecuting " + dosh.getChainName() + " Aggregator. ");
+      dosh.aggregate(sessionPath);
+      break;
+    case shuf:
+      ShufersalAggregator shuf = new ShufersalAggregator();
+      logger.info("Excecuting " + shuf.getChainName() + " Aggregator. ");
+      shuf.aggregate(sessionPath);
+      break;
+    case tiv:
+      TivTaamAggregator tiv = new TivTaamAggregator();
+      logger.info("Excecuting " + tiv.getChainName() + " Aggregator. ");
+      tiv.aggregate(sessionPath);
+      break;
+    case hazi:
+      HaziHinamAggregator hazi = new HaziHinamAggregator();
+      logger.info("Excecuting " + hazi.getChainName() + " Aggregator. ");
+      hazi.aggregate(sessionPath);
+      break;
+    case keshet:
+      KeshetAggregator keshet = new KeshetAggregator();
+      logger.info("Excecuting " + keshet.getChainName() + " Aggregator. ");
+      keshet.aggregate(sessionPath);
+      break;
+    case yohan:
+      YohananofAggregator yohan = new YohananofAggregator();
+      logger.info("Excecuting " + yohan.getChainName() + " Aggregator. ");
+      yohan.aggregate(sessionPath);
+      break;
+    case osher:
+      OsheradAggregator osher = new OsheradAggregator();
+      logger.info("Excecuting " + osher.getChainName() + " Aggregator. ");
+      osher.aggregate(sessionPath);
+      break;
+    case dor:
+      DoralonAggregator dor = new DoralonAggregator();
+      logger.info("Excecuting " + dor.getChainName() + " Aggregator. ");
+      dor.aggregate(sessionPath);
+      break;
+    case victory:
+      VictoryAggregator victory = new VictoryAggregator();
+      logger.info("Excecuting " + victory.getChainName() + " Aggregator. ");
+      victory.aggregate(sessionPath);
+      break;
+    case lahav:
+      LahavAggregator lahav = new LahavAggregator();
+      logger.info("Excecuting " + lahav.getChainName() + " Aggregator. ");
+      lahav.aggregate(sessionPath);
+      break;
+    case hashuk:
+      HashukAggregator hashuk = new HashukAggregator();
+      logger.info("Excecuting " + hashuk.getChainName() + " Aggregator. ");
+      hashuk.aggregate(sessionPath);
+      break;
+    case mega:
+      MegaAggregator mega = new MegaAggregator();
+      logger.info("Excecuting " + mega.getChainName() + " Aggregator. ");
+      mega.aggregate(sessionPath);
+      break;
+    case bitan:
+      BitanAggregator bitan = new BitanAggregator();
+      logger.info("Excecuting " + bitan.getChainName() + " Aggregator. ");
+      bitan.aggregate(sessionPath);
+      break;
+    case eden:
+      EdenAggregator eden = new EdenAggregator();
+      logger.info("Excecuting " + eden.getChainName() + " Aggregator. ");
+      eden.aggregate(sessionPath);
+      break;
+    default:
+      logger.severe("No aggregation instructions for chain " + chainName
+          + ". Provide instruction in main application, and try again.");
+      break;
+    }
+
     logger.info("Finished executing " + aggType + " aggregator for chain "
         + chainName);
 
+  }
+
+  private static boolean parseArgs(String[] args) {
+
+    String usageStr = "USAGE: aggtype=<aggregator-type> chain=<chain-name>";
+
+    if (args.length != 2) {
+      logger.severe(usageStr);
+      return false;
+    }
+
+    try {
+      String[] tmp;
+      String argKey;
+      String argVal;
+      for (String arg : args) {
+        tmp = arg.split("=");
+        argKey = tmp[0].trim();
+        argVal = tmp[1].trim();
+        switch (argKey) {
+        case "aggtype":
+          try {
+            aggType = Enum.valueOf(AggregatorType.class, argVal.toLowerCase());
+          } catch (Exception e) {
+            throw new Exception(
+                "Illegal aggtype arg. Two possible values: daily or hourly.");
+          }
+          break;
+        case "chain":
+          try {
+            chainName = Enum.valueOf(ChainName.class, argVal.toLowerCase());
+          } catch (Exception e) {
+            ChainName[] chains = ChainName.values();
+            StringBuilder sb = new StringBuilder();
+            for (ChainName chainName : chains) {
+              sb.append(chainName + "; ");
+            }
+            throw new Exception("Illegal chain arg. Possible values: "
+                + sb.toString());
+          }
+          break;
+        default:
+          break;
+        }
+      }
+    } catch (Exception e) {
+      logger.severe(e.getMessage());
+      logger.severe(usageStr);
+      return false;
+    }
+
+    return true;
   }
 
   public synchronized static String getDaySubSessionPath(String aggSessionPath) {
